@@ -23,6 +23,7 @@ class Consumer {
     @KafkaListener(topics = ["\${kafka.topics.bank}"], groupId = "ppr")
     fun paymentListener(consumerRecord: ConsumerRecord<Any, Any>, ack: Acknowledgment) {
         val bankMessage: BankMessage = consumerRecord.value() as BankMessage
+        println(bankMessage)
         //check credit card ifo are correct
         val format = SimpleDateFormat("MM/yy")
         val exp = format.parse(bankMessage.exp)
@@ -31,7 +32,7 @@ class Consumer {
             ) && kotlin.random.Random.nextInt(0,100)<50)
         {
             val message: Message<BankPaymentMessage> = MessageBuilder
-                .withPayload(BankPaymentMessage(bankMessage.transaction_id,"SUCCESS"))
+                .withPayload(BankPaymentMessage(bankMessage.transaction_id,"SUCCESS",bankMessage.jwt))
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
                 .build()
@@ -41,7 +42,7 @@ class Consumer {
         else
         {
             val message: Message<BankPaymentMessage> = MessageBuilder
-                .withPayload(BankPaymentMessage(bankMessage.transaction_id,"FAILURE"))
+                .withPayload(BankPaymentMessage(bankMessage.transaction_id,"FAILURE",bankMessage.jwt))
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
                 .build()
