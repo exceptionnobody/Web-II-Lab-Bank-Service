@@ -29,7 +29,7 @@ class Consumer {
         val exp = format.parse(bankMessage.exp)
         if((bankMessage.ccn.length == 16 || bankMessage.ccn.length == 15) && bankMessage.card_holder.isNotEmpty() && bankMessage.cvv.length==3 && exp.after(
                 Date()
-            ) && kotlin.random.Random.nextInt(0,100)<50)
+            ) && kotlin.random.Random.nextInt(0,100)<70)
         {
             val message: Message<BankPaymentMessage> = MessageBuilder
                 .withPayload(BankPaymentMessage(bankMessage.transaction_id,"SUCCESS",bankMessage.jwt))
